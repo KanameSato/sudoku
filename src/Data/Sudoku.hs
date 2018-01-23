@@ -17,7 +17,7 @@ isRandom = not . isFixed
 
 fixedValue :: Cell -> Int
 fixedValue (Fixed v)  = v
-fixedValue (Random l) = error $ "nothing value. Cell condition is " ++ show l
+fixedValue Random = error "nothing value"
 
 
 -- 一意性に矛盾があればTrueを返す
