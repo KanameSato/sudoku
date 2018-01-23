@@ -15,7 +15,7 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Data.Sudoku, Util.Func
+  exposed-modules:     Data.Sudoku, Data.FList, Safe.Func, Util.Func
   build-depends:       base >= 4.7 && < 5
   default-language:    Haskell2010
 
