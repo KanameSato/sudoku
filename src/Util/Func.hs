@@ -43,3 +43,5 @@ splitBlock _ [] = []
 splitBlock n lst = (map concat . DL.transpose) splittedTarget ++ splitBlock n later where
   (target, later) = splitAt n lst
   splittedTarget = map (splitMulti n) target
+
+
