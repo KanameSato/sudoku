@@ -4,6 +4,7 @@ import Control.Monad
 import Data.Maybe
 import Data.Sudoku
 import Data.FList
+import Control.Concurrent.Chan
 
 main :: IO ()
 main = do
