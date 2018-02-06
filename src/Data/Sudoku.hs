@@ -7,6 +7,8 @@ import qualified Data.FList as DF
 import qualified Data.Function as DFun
 import qualified Data.Char  as DC
 import Debug.Trace
+import System.Random
+import System.Random.Shuffle
 
 data Cell = Fixed Int | Random deriving Eq
 
@@ -21,6 +23,7 @@ charToCell c
 instance Show Cell where
   show (Fixed n) = show n
   show Random    = "?"
+
 
 showSudoku :: Sudoku -> String
 showSudoku = show . toList
@@ -64,6 +67,8 @@ isComplete :: Sudoku -> Bool
 isComplete sudoku = allFixed && not (isFailure sudoku) where
   allFixed = all isFixed . concat . toList $ sudoku
 
+-- 数独を解く
+-- 最初に見つかった解を返す
 solve :: Sudoku -> Maybe Sudoku
 solve sudoku
   | isComplete sudoku = return sudoku
@@ -71,13 +76,38 @@ solve sudoku
   | DF.current sudoku == Random = DL.find isComplete . DM.mapMaybe (\x -> solve . DF.next . DF.update (const . Fixed $ x) $ sudoku) $ [1..9]
   | otherwise = solve . DF.next $ sudoku
 
-
+-- 数独を解く
+-- 全ての解を返す
 solveAll :: Sudoku -> [Sudoku]
 solveAll sudoku
   | isComplete sudoku = return sudoku
   | isFailure  sudoku = []
   | DF.current sudoku == Random = filter isComplete . DL.concatMap (\x -> solveAll . DF.next . DF.update (const . Fixed $ x) $ sudoku) $ [1..9]
   | otherwise = solveAll . DF.next $ sudoku
+
+-- ジェネレータ
+solveRandom :: [Int] -> StdGen -> Sudoku -> [Sudoku]
+solveRandom lst gen sudoku
+  | isComplete sudoku = [sudoku]
+  | isFailure  sudoku = []
+  | DF.current sudoku == Random = filter isComplete . DL.concatMap (\x -> solveRandom (UF.shuffle gen lst) gen . DF.next . DF.update (const . Fixed $ x) $ sudoku) $ lst
+  | otherwise = solveRandom lst gen . DF.next $ sudoku
+
+
+-- ランダムな並びの数独を返す
+genSolvedSudoku :: IO Sudoku
+genSolvedSudoku = do
+  shuffled <- shuffleM [1..9]
+  seed <- getStdRandom random :: IO Int
+  let gen = mkStdGen seed
+  return . head $ solveRandom shuffled gen . DF.fromList $ replicate 81 Random
+
+
+hide :: Int -> Sudoku -> Sudoku
+hide 0 sudoku = sudoku
+hide n sudoku = hide (n-1) $ hide' sudoku where
+  hide' sudoku = undefined
+
 
 --  ?????????
 --  ???????27
@@ -118,6 +148,18 @@ solveAll sudoku
 --  ?????????
 --  ?????????
 --  ?????????
+
+
+
+--  265983741
+--  134257689
+--
+--
+--
+--
+--
+--
+--
 
 
 

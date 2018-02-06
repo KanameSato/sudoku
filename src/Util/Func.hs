@@ -1,5 +1,7 @@
 module Util.Func where
 
+import System.Random
+import GHC.Exts
 import Data.List as DL
 
 -- リスト内に重複要素がなければTrueを返す
@@ -45,3 +47,13 @@ splitBlock n lst = (map concat . DL.transpose) splittedTarget ++ splitBlock n la
   splittedTarget = map (splitMulti n) target
 
 
+rotateL :: [a] -> [a]
+rotateL [] = []
+rotateL (x:xs) = xs++[x]
+
+shuffle :: StdGen -> [a] -> [a]
+shuffle gen lst = map fst . sortWith snd . zip lst $ (chain random gen :: [Int])
+
+chain :: (a -> (b, a)) -> a -> [b]
+chain f g = value:chain f nextGen where
+  (value, nextGen) = f g
